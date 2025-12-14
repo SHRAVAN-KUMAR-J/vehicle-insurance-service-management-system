@@ -1,0 +1,365 @@
+/* Reset default margins and ensure full-width */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.about-container {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.anim-section {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.anim-section.visible {
+  animation: fadeInUp 0.8s ease forwards;
+}
+
+/* Hero Section */
+.hero-section {
+  width: 100%;
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #667eea 100%);
+  color: white;
+  padding: 100px 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.05"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+  pointer-events: none;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.hero-content h1 {
+  font-size: 3.5rem;
+  margin-bottom: 20px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.hero-content p {
+  font-size: 1.3rem;
+  margin-bottom: 40px;
+  opacity: 0.95;
+  font-weight: 300;
+}
+
+/* CTA Button */
+.cta-button {
+  display: inline-block;
+  padding: 15px 40px;
+  background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+  color: white;
+  text-decoration: none;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+}
+
+.cta-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(255, 107, 107, 0.4);
+  color: white;
+}
+
+/* Content Sections */
+.content-section {
+  width: 100%;
+  padding: 80px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.content-section:last-of-type {
+  border-bottom: none;
+}
+
+.content-section.alternate {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.section-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.image-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 20px;
+}
+
+.section-image {
+  width: 100%;
+  height: 450px;
+  object-fit: cover;
+  transition: all 0.4s ease;
+  filter: brightness(1.05);
+}
+
+.section-image:hover {
+  transform: scale(1.02);
+  filter: brightness(1.1);
+}
+
+.text-container {
+  width: 100%;
+}
+
+.text-container h2 {
+  font-size: 2.5rem;
+  margin-bottom: 25px;
+  color: #2c3e50;
+  font-weight: 700;
+  position: relative;
+}
+
+.text-container h2::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 50px;
+  height: 3px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 2px;
+}
+
+.text-container p {
+  font-size: 1.15rem;
+  line-height: 1.8;
+  margin-bottom: 25px;
+  color: #5a6c7d;
+}
+
+/* Feature List */
+.feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 30px 0;
+}
+
+.feature-list li {
+  padding: 12px 0;
+  font-size: 1.05rem;
+  color: #4a5568;
+  display: flex;
+  align-items: center;
+  transition: color 0.3s ease;
+}
+
+.feature-list li:hover {
+  color: #667eea;
+}
+
+.feature-icon {
+  margin-right: 12px;
+  font-size: 1.2em;
+}
+
+/* Workflow Steps */
+.workflow-steps {
+  margin-top: 40px;
+  display: grid;
+  gap: 20px;
+}
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  padding: 25px;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  border-left: 4px solid #667eea;
+}
+
+.step:hover {
+  transform: translateX(10px);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+}
+
+.step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border-radius: 50%;
+  font-weight: bold;
+  font-size: 1.2rem;
+  margin-right: 20px;
+  flex-shrink: 0;
+}
+
+.step-content h4 {
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+  color: #2c3e50;
+}
+
+.step-content p {
+  color: #7f8c8d;
+  margin: 0;
+}
+
+/* CTA Section */
+.cta-section {
+  width: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 100px 0;
+  text-align: center;
+  position: relative;
+}
+
+.cta-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.cta-content h2 {
+  font-size: 2.8rem;
+  margin-bottom: 20px;
+  font-weight: 700;
+}
+
+.cta-content p {
+  font-size: 1.2rem;
+  margin-bottom: 40px;
+  opacity: 0.9;
+}
+
+.cta-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.cta-button.primary {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+}
+
+.cta-button.secondary {
+  background: transparent;
+  border: 2px solid white;
+  color: white;
+}
+
+.cta-button.secondary:hover {
+  background: white;
+  color: #667eea;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hero-content h1 {
+    font-size: 2.5rem;
+  }
+
+  .hero-content p {
+    font-size: 1.1rem;
+  }
+
+  .text-container h2 {
+    font-size: 2rem;
+  }
+
+  .section-content {
+    grid-template-columns: 1fr;
+    gap: 50px;
+    padding: 0 15px;
+  }
+
+  .section-image {
+    height: 300px;
+  }
+
+  .cta-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .cta-button {
+    width: 100%;
+    max-width: 250px;
+  }
+
+  .step {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .step-number {
+    margin-right: 0;
+    margin-bottom: 15px;
+  }
+
+  .workflow-steps {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-section,
+  .cta-section {
+    padding: 60px 0;
+  }
+
+  .content-section {
+    padding: 50px 0;
+  }
+
+  .section-image {
+    height: 250px;
+  }
+}
