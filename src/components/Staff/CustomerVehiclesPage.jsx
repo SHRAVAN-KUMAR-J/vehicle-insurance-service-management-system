@@ -247,14 +247,52 @@ function CustomerVehiclesPage() {
 
   const handleSubmitDates = async (e) => {
     e.preventDefault();
+    
+    // Validate that at least one field is filled
+    const hasStartDate = insuranceDates.startDate.trim() !== '';
+    const hasExpiryDate = insuranceDates.expiryDate.trim() !== '';
+    const hasAmount = insuranceDates.insuranceAmount !== '';
+    
+    if (!hasStartDate && !hasExpiryDate && !hasAmount) {
+      setError('Please fill at least one field (dates or amount)');
+      return;
+    }
+
+    // Validate dates if both are provided
+    if (hasStartDate && hasExpiryDate) {
+      const start = new Date(insuranceDates.startDate);
+      const expiry = new Date(insuranceDates.expiryDate);
+      
+      if (expiry <= start) {
+        setError('Expiry date must be after start date');
+        return;
+      }
+    }
+
+    // If only one date is provided, show error
+    if ((hasStartDate && !hasExpiryDate) || (!hasStartDate && hasExpiryDate)) {
+      setError('Please provide both start date and expiry date, or leave both empty');
+      return;
+    }
+
     setSubmittingDates(true);
     try {
-      const res = await api.put(`/vehicle/${selectedVehicle._id}/insurance-dates`, insuranceDates);
+      const payload = {};
+      if (hasStartDate && hasExpiryDate) {
+        payload.startDate = insuranceDates.startDate;
+        payload.expiryDate = insuranceDates.expiryDate;
+      }
+      if (hasAmount) {
+        payload.insuranceAmount = insuranceDates.insuranceAmount;
+      }
+
+      const res = await api.put(`/vehicle/${selectedVehicle._id}/insurance-dates`, payload);
       setVehicles(vehicles.map(v => v._id === selectedVehicle._id ? res.data.data : v));
-      setSuccess('Insurance dates set successfully!');
+      setSuccess('Insurance details updated successfully!');
       setShowModal(false);
+      setError('');
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to set insurance dates');
+      setError(err.response?.data?.message || 'Failed to update insurance details');
     } finally {
       setSubmittingDates(false);
     }
@@ -304,9 +342,18 @@ function CustomerVehiclesPage() {
     setSubmittingVehicle(true);
     try {
       let payload = { ...vehicleFormData };
+      
+      // Remove empty fields to avoid sending empty strings
+      Object.keys(payload).forEach(key => {
+        if (payload[key] === '') {
+          delete payload[key];
+        }
+      });
+
       if (!showEditModal) {
         payload.customerId = customerId;
       }
+      
       let res;
       if (showEditModal && selectedVehicleForEdit) {
         res = await api.put(`/vehicle/${selectedVehicleForEdit._id}`, payload);
@@ -319,6 +366,7 @@ function CustomerVehiclesPage() {
       }
       setShowAddModal(false);
       setShowEditModal(false);
+      setError('');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to save vehicle');
     } finally {
@@ -567,7 +615,7 @@ function CustomerVehiclesPage() {
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
-                        <span>{vehicle.startDate ? 'Update Insurance Dates' : 'Set Insurance Dates'}</span>
+                        <span>{vehicle.startDate ? 'Update Insurance Details' : 'Set Insurance Details'}</span>
                       </button>
                       <button
                         onClick={() => handleEditVehicle(vehicle)}
@@ -614,7 +662,7 @@ function CustomerVehiclesPage() {
             <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
               <div className="p-6">
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-2xl font-bold text-gray-900">Insurance Dates for {selectedVehicle.registrationNumber}</h3>
+                  <h3 className="text-2xl font-bold text-gray-900">Insurance Details for {selectedVehicle.registrationNumber}</h3>
                   <button onClick={closeDatesModal} className="text-gray-400 hover:text-gray-600">
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -628,27 +676,25 @@ function CustomerVehiclesPage() {
                 )}
                 <form onSubmit={handleSubmitDates} className="space-y-6">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Start Date</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Start Date (Optional)</label>
                     <input
                       type="date"
                       value={insuranceDates.startDate}
                       onChange={(e) => setInsuranceDates({ ...insuranceDates, startDate: e.target.value })}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 outline-none"
-                      required
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Expiry Date</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Expiry Date (Optional)</label>
                     <input
                       type="date"
                       value={insuranceDates.expiryDate}
                       onChange={(e) => setInsuranceDates({ ...insuranceDates, expiryDate: e.target.value })}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 outline-none"
-                      required
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Insurance Amount (₹)</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Insurance Amount ₹ (Optional)</label>
                     <input
                       type="number"
                       step="0.01"
@@ -659,9 +705,9 @@ function CustomerVehiclesPage() {
                       placeholder="e.g., 15000"
                     />
                   </div>
-                  <div className="bg-yellow-50 p-4 rounded-xl border border-yellow-200">
-                    <p className="text-sm text-yellow-800">
-                      <strong>Note:</strong> Setting expiry date will trigger automatic renewal reminders.
+                  <div className="bg-blue-50 p-4 rounded-xl border border-blue-200">
+                    <p className="text-sm text-blue-800">
+                      <strong>Note:</strong> You can set dates only, amount only, or both together. If setting dates, both start and expiry dates are required.
                     </p>
                   </div>
                   <div className="flex gap-4 pt-4">
@@ -670,7 +716,7 @@ function CustomerVehiclesPage() {
                       disabled={submittingDates}
                       className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 rounded-xl font-semibold hover:from-blue-600 hover:to-blue-700 shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50"
                     >
-                      {submittingDates ? 'Setting...' : 'Set Dates'}
+                      {submittingDates ? 'Updating...' : 'Update Details'}
                     </button>
                     <button
                       type="button"
@@ -711,7 +757,7 @@ function CustomerVehiclesPage() {
                 )}
                 <form onSubmit={handleSubmitVehicle} className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Registration Number</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Registration Number *</label>
                     <input
                       type="text"
                       name="registrationNumber"
@@ -729,11 +775,11 @@ function CustomerVehiclesPage() {
                       value={vehicleFormData.chassisNumber}
                       onChange={(e) => setVehicleFormData({ ...vehicleFormData, [e.target.name]: e.target.value })}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 outline-none"
-                      required
+                      placeholder="Can be added later"
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Vehicle Model</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Vehicle Model *</label>
                     <input
                       type="text"
                       name="model"
@@ -764,13 +810,14 @@ function CustomerVehiclesPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Insurance Amount (₹)</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Insurance Amount ₹ (Optional)</label>
                     <input
                       type="number"
                       name="insuranceAmount"
                       value={vehicleFormData.insuranceAmount}
                       onChange={(e) => setVehicleFormData({ ...vehicleFormData, [e.target.name]: e.target.value })}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 outline-none"
+                      placeholder="Can be set later"
                     />
                   </div>
                   <div>
@@ -802,6 +849,11 @@ function CustomerVehiclesPage() {
                       onChange={(e) => setVehicleFormData({ ...vehicleFormData, [e.target.name]: e.target.value })}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 outline-none"
                     />
+                  </div>
+                  <div className="md:col-span-2 bg-yellow-50 p-4 rounded-xl border border-yellow-200">
+                    <p className="text-sm text-yellow-800">
+                      <strong>Note:</strong> Only Registration Number and Model are required. All other fields are optional and can be added or updated later.
+                    </p>
                   </div>
                   <div className="md:col-span-2 flex gap-4 pt-4">
                     <button
